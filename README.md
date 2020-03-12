@@ -1,2 +1,2 @@
-# power-state-with-ping
-Helper to determined device power state using ping command
+# Power State with Ping
+Node.js helper - to determined device power state using ping command
