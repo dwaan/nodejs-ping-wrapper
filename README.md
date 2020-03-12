@@ -1,2 +1,2 @@
 # power-state-with-ping
-Node.js helper - Determaining device wake status based on ping responses
+Helper to determined device power state using ping command
