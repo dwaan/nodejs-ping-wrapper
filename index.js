@@ -24,7 +24,13 @@ util.inherits(powerStateWithPing, EventEmitter);
 powerStateWithPing.debug = false;
 
 // Emit event: 'ready', 'awake', 'sleep'
-powerStateWithPing.prototype.connect = function() {
+powerStateWithPing.prototype.connect = function(execute = true) {
+	if(execute) this.subscribe();
+	if(this.debug) console.log("PS: Ready");
+	this.emit("ready");
+}
+
+powerStateWithPing.prototype.subscribe = function() {
 	var run_command = () => {
 		exec(`ping -c ${this.alive/1000} -t ${this.alive/1000} -s 1 ${this.ip} | grep " 0.0% "`, (err, stdout, stderr) => {
 			if(this.is_sleep == null) {
@@ -57,9 +63,6 @@ powerStateWithPing.prototype.connect = function() {
 	run_command();
 	clearInterval(this.main_loop);
 	this.main_loop = setInterval(run_command, this.alive);
-
-	if(this.debug) console.log("PS: Ready");
-	this.emit("ready");
 }
 
 powerStateWithPing.prototype.disconnect = function() {
