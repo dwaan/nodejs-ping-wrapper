@@ -2,8 +2,6 @@ var nvidiaShieldAdb = require('../power-state-with-ping');
 
 var nintendoSwitch = new nvidiaShieldAdb('192.168.1.110', 10000);
 
-nintendoSwitch.connect();
-nintendoSwitch.debug = true;
 
 function getDateTime() {
     var date = new Date();
@@ -34,6 +32,8 @@ nintendoSwitch.on('ready', function() {
 		console.log(getDateTime() + " TS: Nintendo Switch status -> " + status);
 	})
 });
+nintendoSwitch.connect();
+nintendoSwitch.debug = true;
 
 nintendoSwitch.on('awake', function(current_app) {
 	console.log(getDateTime() + " TS: Nintendo Switch -> awake");
