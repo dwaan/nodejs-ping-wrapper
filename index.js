@@ -32,7 +32,7 @@ powerStateWithPing.prototype.connect = function(execute = true) {
 
 powerStateWithPing.prototype.subscribe = function() {
 	var run_command = () => {
-		exec(`ping -c ${this.alive/1000} -t ${this.alive/1000} -s 1 ${this.ip} | grep " 0.0% "`, (err, stdout, stderr) => {
+		exec(`ping -c ${this.alive/1000} -t ${this.alive/1000} -s 1 ${this.ip} | grep -E " 0.0% | 0% "`, (err, stdout, stderr) => {
 			if(this.is_sleep == null) {
 				if (stdout.trim().length > 0) {
 					this.is_sleep = true;
