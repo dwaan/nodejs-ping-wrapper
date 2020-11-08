@@ -33,7 +33,7 @@ powerStateWithPing.prototype.connect = function(execute = true) {
 powerStateWithPing.prototype.subscribe = function() {
 	var run_command = () => {
 		exec(`ping -c ${this.alive/1000} -t ${this.alive/1000} -s 1 ${this.ip} | grep -E " 0.0% | 0% "`, (err, stdout, stderr) => {
-			if(this.is_sleep == null) {
+			if (this.is_sleep == null) {
 				if (stdout.trim().length > 0) {
 					this.is_sleep = true;
 				} else {
@@ -43,13 +43,18 @@ powerStateWithPing.prototype.subscribe = function() {
 
 			if (stdout.trim().length > 0) {
 				if(this.is_sleep) {
-					if(this.debug) console.log("PS: Awake");
+					this.awake_time++;
 
-					this.is_sleep = false;
-					this.emit("awake");
+					if (this.awake_time > 2) {
+						if(this.debug) console.log("PS: Awake");
+
+						this.awake_time = 0;
+						this.is_sleep = false;
+						this.emit("awake");
+					}
 				}
 			} else {
-				if(!this.is_sleep) {
+				if (!this.is_sleep) {
 					if(this.debug) console.log(`PS: Sleep`);
 
 					this.is_sleep = true;
