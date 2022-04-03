@@ -1,10 +1,10 @@
 {
   "name": "power-state-with-ping",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Node.js helper to determine device power state using ping",
   "main": "index.js",
   "scripts": {
-    "test": "node test"
+    "test": "nodemon test.js"
   },
   "keywords": [
     "node.js",
@@ -12,5 +12,8 @@
     "helper"
   ],
   "author": "Dwan",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "net-ping": "^1.2.3"
+  }
 }
