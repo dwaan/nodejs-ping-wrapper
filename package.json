@@ -13,7 +13,7 @@
   ],
   "author": "Dwan",
   "license": "MIT",
-  "devDependencies": {
+  "dependencies": {
     "net-ping": "^1.2.3"
   }
 }
