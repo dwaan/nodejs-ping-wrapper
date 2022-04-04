@@ -8,10 +8,13 @@ let
 
 // alive: time to take wait untill a device can be consider awake.
 //        -> Nintendo Switch have 3 - 8 seconds ping alive when it sleep
-var powerStateWithPing = module.exports = function(ip, alive = 10000) {
+var powerStateWithPing = module.exports = function(ip, alive = 10) {
 	EventEmitter.call(this);
 
 	this.alive = alive;
+	this.count = this.alive;
+	this.offCount = 0;
+	this.statusCallback = undefined;
 
 	if (!ip) {
 		console.log("PS: Please provide your device IP");
@@ -33,33 +36,44 @@ powerStateWithPing.prototype.connect = function(execute = true) {
 powerStateWithPing.prototype.subscribe = function() {
 	var session = ping.createSession ();
 	var run_command = () => {
-		session.pingHost (this.ip, (error, target) => {
-			if (error) {
-				if(this.debug) {
-					if (error instanceof ping.RequestTimedOutError)
-						console.log (`PS: ${target} Sleep`);
-					else 
-						console.log (`PS: ${target} Error`, error.toString());
+		session.pingHost (this.ip, (error) => {
+			if (error) this.offCount++;
+			else this.offCount = 0;
+
+			this.count--;
+			if(this.count <= 0) {
+				this.count = 0;
+
+				// Run the callback
+				if(this.statusCallback) {
+					this.statusCallback(!this.isSleep);
+					this.statusCallback = undefined;
 				}
 
-				if (this.is_sleep != true) {
-					this.is_sleep = true;
-					this.emit("sleep");
+				if(this.offCount >= this.alive) {
+					this.offCount = this.alive;
+
+					if (this.isSleep != true) {
+						this.isSleep = true;
+						this.emit("sleep");
+						if(this.debug) console.log("PS: Sleep");
+					}
+				} else {
+					if (this.isSleep != false) {
+						this.isSleep = false;
+						this.emit("awake");
+						if(this.debug) console.log("PS: Awake");
+					}
 				}
 			} else {
-				if(this.debug) console.log(`PS: ${target} Awake`);
-
-				if (this.is_sleep != false) {
-					this.is_sleep = false;
-					this.emit("awake");
-				}
+				if(this.debug) console.log("PS: count", this.count);
 			}
 		});
 	}
 
 	run_command();
 	clearInterval(this.main_loop);
-	this.main_loop = setInterval(run_command, this.alive);
+	this.main_loop = setInterval(run_command, 1000);
 }
 
 powerStateWithPing.prototype.disconnect = function() {
@@ -67,5 +81,5 @@ powerStateWithPing.prototype.disconnect = function() {
 }
 
 powerStateWithPing.prototype.status = function(callback = function() {}) {
-	callback(!this.is_sleep);
+	this.statusCallback = callback;
 }
