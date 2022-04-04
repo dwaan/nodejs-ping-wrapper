@@ -1,5 +1,5 @@
 var powerStateWithPing = require('../power-state-with-ping');
-var nintendoSwitch = new powerStateWithPing('192.168.1.6', 10000);
+var nintendoSwitch = new powerStateWithPing('192.168.1.106', 14000);
 
 function getDateTime() {
     var date = new Date();
