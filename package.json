@@ -1,7 +1,7 @@
 {
-  "name": "power-state-with-ping",
-  "version": "2.0.0",
-  "description": "Node.js helper to determine device power state using ping",
+  "name": "nodejs-ping-wrapper",
+  "version": "1.0.0",
+  "description": "Node.js module to determine device power state using ping",
   "main": "index.js",
   "scripts": {
     "test": "nodemon test.js"

@@ -1,5 +1,5 @@
-var powerStateWithPing = require('../power-state-with-ping');
-var nintendoSwitch = new powerStateWithPing('192.168.1.106', 20, 4);
+var nPing = require('../power-state-with-ping');
+var nintendoSwitch = new nPing('192.168.1.106', 20, 4);
 
 function getDateTime() {
     var date = new Date();
@@ -24,19 +24,23 @@ function getDateTime() {
     return year + ":" + month + ":" + day + " " + hour + ":" + min + ":" + sec;
 }
 
-nintendoSwitch.on('ready', function() {
+nintendoSwitch.on('ready', () => {
 	console.log("TS: Nintendo Switch ready");
-	this.status((status) => {
+	nintendoSwitch.status((status) => {
 		console.log(getDateTime(), "TS: Nintendo Switch current status -> ", status ? "ON" : "OFF");
 	});
 });
 nintendoSwitch.connect();
 nintendoSwitch.debug = true;
 
-nintendoSwitch.on('awake', function() {
+nintendoSwitch.on('awake', () => {
 	console.log(getDateTime(), "TS: Nintendo Switch -> awake");
 });
 
-nintendoSwitch.on('sleep', function() {
+nintendoSwitch.on('sleep', () => {
 	console.log(getDateTime(), "TS: Nintendo Switch -> sleep");
 });
+
+nintendoSwitch.on(`update`, () => {
+    console.log(`TS: Nintendo Switch -> updated`);
+})
