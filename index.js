@@ -1,12 +1,12 @@
 'use strict';
 
-const ping = require ("net-ping");
+const netPing = require ("net-ping");
 const EventEmitter = require('events');
 
 // live: time to take wait untill a device can be consider awake.
 //        -> Nintendo Switch have 3 - 8 seconds ping alive when it sleep
 // Emit event: 'ready', 'awake', 'sleep'
-class nPing extends EventEmitter {
+class ping extends EventEmitter {
     constructor(ip, alive = 10, every = 1) {
         if (!ip) return;
 
@@ -28,7 +28,7 @@ class nPing extends EventEmitter {
 	}
 
 	subscribe = function() {
-		var session = ping.createSession ({
+		var session = netPing.createSession ({
 			ttl: 1
 		});
 		var runPing = () => {
@@ -83,4 +83,4 @@ class nPing extends EventEmitter {
 	}
 }
 
-module.exports = nPing;
+module.exports = ping;
