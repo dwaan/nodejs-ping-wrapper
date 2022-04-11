@@ -1,5 +1,5 @@
 var ping = require('../nodejs-ping-wrapper');
-var nSwitch = new ping('192.168.1.106', 20, 4);
+var nSwitch = new ping('192.168.1.106', 20, 1);
 
 function getDateTime() {
     var date = new Date();
@@ -43,4 +43,4 @@ nSwitch.on(`connected`, function () {
 	});
 });
 
-nSwitch.connect();
+nSwitch.connect().catch(e => console.log("Can't use net-ping"));

@@ -1,9 +1,11 @@
 'use strict';
 
-const netPing = require ("net-ping");
-const EventEmitter = require('events');
+const netPing = require (`net-ping`);
+const EventEmitter = require(`events`);
+const { execFile } = require(`child_process`, () => {
 
-// live: time to take wait untill a device can be consider awake.
+	// live: time to take wait untill a device can be consider awake.
+});
 //        -> Nintendo Switch have 3 - 8 seconds ping alive when it sleep
 // Emit event: 'connected', 'awake', 'sleep', `update`
 class ping extends EventEmitter {
@@ -31,71 +33,82 @@ class ping extends EventEmitter {
 			await this.subscribe();
 			this.emit("connected");
 		} else {
-			var session = netPing.createSession ({ ttl: 1 });
-			session.pingHost(this.ip, (error) => {
-				this.emit("connected");
-
-				if(error) {
-					this.isSleep = true;
-					this.isAwake = !this.isSleep;
-					this.emit('sleep');
-				} else {
-					this.isSleep = false;
-					this.isAwake = !this.isSleep;
-					this.emit('awake');
-				}
-			});
+			let result = await this.ping();
+			if (result) {
+				this.isSleep = true;
+				this.isAwake = !this.isSleep;
+				this.emit('sleep');
+			} else {
+				this.isSleep = false;
+				this.isAwake = !this.isSleep;
+				this.emit('awake');
+			}
 
 			this.subscribe();
+			this.emit("connected");
 		}
+	}
+
+	ping = async () => {
+		return new Promise(async (resolve) => {
+			try {
+				var session = netPing.createSession ({ ttl: 1 });
+				session.pingHost(this.ip, (error) => {
+					if(!error) resolve(false);
+					else resolve(true);
+				});
+			} catch(error) {
+				execFile(`ping`, [`-c 1`, `-t 1`, this.ip], (error) => {
+					if(!error) resolve(false);
+					else resolve(true);
+				});
+			}
+		});
 	}
 
 	subscribe = async () => {
 		return new Promise(async (resolve) => {
-			var session = netPing.createSession ({ ttl: 1 });
-
 			if(this.mainLoop) clearInterval(this.mainLoop);
-			this.mainLoop = setInterval(() => {
-				session.pingHost(this.ip, (error) => {
-					if(error) {
-						this.sleepCount++;
-						this.awakeCount = 0;
-					} else {
-						this.sleepCount = 0;
-						this.awakeCount++;
+			this.mainLoop = setInterval(async () => {
+				let result = await this.ping();
+				if(result) {
+					this.sleepCount++;
+					this.awakeCount = 0;
+				} else {
+					this.sleepCount = 0;
+					this.awakeCount++;
+				}
+
+				if(this.sleepCount > this.alive - 1) {
+					if (this.isSleep != true) {
+						this.isSleep = true;
+						this.isAwake = !this.isSleep;
+						this.emit("sleep");
+						resolve(this.isAwake);
 					}
-
-					if(this.sleepCount > this.alive - 1) {
-						if (this.isSleep != true) {
-							this.isSleep = true;
-							this.isAwake = !this.isSleep;
-							this.emit("sleep");
-							resolve(this.isAwake);
-						}
-						this.sleepCount = 0;
-					} else if(this.awakeCount > this.alive - 1) {
-						if (this.isSleep != false) {
-							this.isSleep = false;
-							this.isAwake = !this.isSleep;
-							this.emit("awake");
-							resolve(this.isAwake);
-						}
-						this.awakeCount = 0;
+					this.sleepCount = 0;
+				} else if(this.awakeCount > this.alive - 1) {
+					if (this.isSleep != false) {
+						this.isSleep = false;
+						this.isAwake = !this.isSleep;
+						this.emit("awake");
+						resolve(this.isAwake);
 					}
+					this.awakeCount = 0;
+				}
 
-					// Run status callback
-					this.callbackCount--;
-					if(this.statusCallback && this.callbackCount <= 0) {
-						this.callbackCount = 0;
+				// Run status callback
+				this.callbackCount--;
+				if(this.statusCallback && this.callbackCount <= 0) {
+					this.callbackCount = 0;
 
-						if(this.isSleep == undefined) this.isSleep = true;
+					if(this.isSleep == undefined) this.isSleep = true;
 
-						this.statusCallback(!this.isSleep);
-						this.statusCallback = undefined;
-					}
+					this.statusCallback(!this.isSleep);
+					this.statusCallback = undefined;
+				}
 
-					this.emit(`update`);
-				});
+				this.emit(`update`);
 			}, this.every * 1000);
 		});
 	}
