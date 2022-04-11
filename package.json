@@ -1,6 +1,6 @@
 {
   "name": "nodejs-ping-wrapper",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Node.js module to determine device power state using ping",
   "main": "index.js",
   "scripts": {
