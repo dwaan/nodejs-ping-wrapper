@@ -1,11 +1,9 @@
 'use strict';
 
-const netPing = require (`net-ping`);
 const EventEmitter = require(`events`);
-const { execFile } = require(`child_process`, () => {
+const { execFile } = require(`child_process`);
 
-	// live: time to take wait untill a device can be consider awake.
-});
+// alive: time to take wait untill a device can be consider awake.
 //        -> Nintendo Switch have 3 - 8 seconds ping alive when it sleep
 // Emit event: 'connected', 'awake', 'sleep', `update`
 class ping extends EventEmitter {
@@ -52,16 +50,12 @@ class ping extends EventEmitter {
 	ping = async () => {
 		return new Promise(async (resolve) => {
 			try {
-				var session = netPing.createSession ({ ttl: 1 });
-				session.pingHost(this.ip, (error) => {
-					if(!error) resolve(false);
-					else resolve(true);
-				});
-			} catch(error) {
 				execFile(`ping`, [`-c 1`, `-t 1`, this.ip], (error) => {
 					if(!error) resolve(false);
 					else resolve(true);
 				});
+			} catch(error) {
+				resolve(false);
 			}
 		});
 	}
