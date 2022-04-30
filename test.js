@@ -1,5 +1,5 @@
 var ping = require('../nodejs-ping-wrapper');
-var nSwitch = new ping('192.168.1.106', 20, 5);
+var nSwitch = new ping('192.168.1.106', 22);
 
 function getDateTime() {
     var date = new Date();
@@ -24,6 +24,7 @@ nSwitch.on('sleep', () => {
 
 nSwitch.on(`update`, (count, awake, sleep) => {
     console.log(getDateTime(), `TS: Nintendo Switch -> Count: ${count}, awake: ${awake}, sleep: ${sleep}`);
+    console.log(nSwitch._count);
 });
 
 nSwitch.on(`connected`, () => {
@@ -31,6 +32,10 @@ nSwitch.on(`connected`, () => {
     nSwitch.status((status) => {
         console.log(getDateTime(), "TS: Nintendo Switch current status -> ", status ? "ON" : "OFF");
     });
+});
+
+nSwitch.on(`before`, (count) => {
+    console.log("TS: count", count);
 });
 
 nSwitch.connect().catch(e => console.log("Can't use net-ping", e));

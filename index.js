@@ -75,11 +75,11 @@ class ping extends EventEmitter {
 
 				this._count.push(result ? 1 : 0);
 
-				if (this._count.length == this._alive + 1) {
+				if (this._count.length >= this._alive + 1) {
 					this._count.shift();
 					result = count(this._count);
 
-					if (result == this._alive && !this.isAwake) {
+					if (result >= this._alive && !this.isAwake) {
 						this.isSleep = false;
 						this.isAwake = !this.isSleep;
 						this.emit("awake", result, this.isAwake, this.isSleep);
@@ -104,6 +104,7 @@ class ping extends EventEmitter {
 				}
 
 				if (this.isAwake != undefined) this.emit(`update`, result, this.isAwake, this.isSleep);
+				else this.emit(`before`, this._count);
 			}, this._every * 1000);
 		});
 	}
