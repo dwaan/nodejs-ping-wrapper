@@ -24,7 +24,6 @@ nSwitch.on('sleep', () => {
 
 nSwitch.on(`update`, (count, awake, sleep) => {
     console.log(getDateTime(), `TS: Nintendo Switch -> Count: ${count}, awake: ${awake}, sleep: ${sleep}`);
-    console.log(nSwitch._count);
 });
 
 nSwitch.on(`connected`, () => {

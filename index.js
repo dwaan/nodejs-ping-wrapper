@@ -49,7 +49,7 @@ class ping extends EventEmitter {
 	ping = async () => {
 		return new Promise(async (resolve) => {
 			try {
-				execFile(`ping`, [`-c 1`, `-t 1`, this._ip], (error) => {
+				execFile(`ping`, [`-c 1`, `-W 1`, this._ip], (error) => {
 					if (error) resolve(false);
 					else resolve(true);
 				});
